@@ -2,25 +2,42 @@
 
 This project develops a SQL-powered risk scoring pipeline for an auto insurance portfolio using a synthetic dataset. The goal is to demonstrate SQL-first data modelling, risk flag creation, scoring logic, and risk-performance analysis. This project highlights how actuarial-style portfolio segmentation can be driven by SQL queries alone, transforming raw insurance data into actionable insights for fraud detection, underwriting, and pricing adjustments.
 
+Access dashboard online via:
+https://ahad0926-auto-insurance-fraud-risk-sql-streamlit-appapp-rmgy77.streamlit.app/
+
 ---
 
 ## Project Structure
 
-- `datasets/`
-  - `raw/`: Original Kaggle dataset (`Car_Insurance_Claim.csv`)
-  - `processed/`: Cleaned, normalized CSVs split into:
-    - `customers.csv`
-    - `vehicles.csv`
-    - `driving_history.csv`
-    - `claims.csv`
-  - `data_cleaning.ipynb`: Notebook to clean and split the raw data.
-
-- `sql/`
-  - `schema.sql`: SQL database schema (`CREATE TABLE` statements).
-  - `risk_flags.sql`: Risk flag queries.
-  - `risk_scoring.sql`: Combined risk scoring logic.
-  - `risk_analysis.sql`: Exploratory risk and claim profiling queries.
-  - `analytics.sql`: Portfolio performance and risk group summaries.
+```
+├── datasets/
+│   ├── raw/                      # Original Kaggle dataset
+│   │   └── Car_Insurance_Claim.csv
+│   ├── processed/                # Cleaned and split normalized tables
+│   │   ├── customers.csv
+│   │   ├── vehicles.csv
+│   │   ├── driving_history.csv
+│   │   └── claims.csv
+│   └── data_cleaning.ipynb       # Data prep and splitting
+│
+├── sql/
+│   ├── schema.sql                # Table creation statements
+│   ├── risk_flags.sql            # Risk flag logic
+│   ├── risk_scoring.sql          # Final risk scoring logic
+│   ├── risk_analysis.sql         # Exploratory profiling queries
+│   └── analytics.sql             # Portfolio and performance summaries
+│
+├── streamlit_app/                # Interactive analytics dashboard
+|   ├── pages/
+│   |   ├── 1_Overview.py
+│   |   ├── 2_Risk_Scoring.py
+│   |   ├── 3_Segment_Explorer.py
+│   |   └── 4_Dashboard_Summary.py
+|   ├── venv/
+|   ├── app.py
+|   ├── db_connection.py
+|   └── requirements.txt    
+```
 
 ---
 
@@ -32,6 +49,7 @@ This project develops a SQL-powered risk scoring pipeline for an auto insurance 
 - Analyze how risk scores correlate with actual claim-filing rates.
 - Segment the portfolio into actionable risk tiers using only SQL.
 - Provide descriptive and performance summaries for fraud detection and pricing teams.
+- Visualize portfolio insights interactively using Streamlit.
 
 ---
 
@@ -49,69 +67,39 @@ This project develops a SQL-powered risk scoring pipeline for an auto insurance 
 
 ## Tools & Techniques
 
-- MySQL Workbench for database design and queries.
-- SQL techniques: `CASE WHEN`, `JOIN`, `GROUP BY`, Common Table Expressions (CTEs), and `CREATE VIEW`.
-- Pandas for initial CSV cleaning and splitting.
-- Modular query structure with reusable views for scoring.
-- Risk thresholding informed by common insurance heuristics.
+- **SQL**: MySQL Workbench, `JOIN`, `CASE`, `GROUP BY`, `CREATE VIEW`, CTEs.
+- **Streamlit**: Interactive dashboard with charts, filters, segment profiling.
+- **Plotly**: Bar charts, pie charts, line graphs, heatmaps, and grouped visualizations.
+- **Pandas**: CSV pre-processing.
+- Modular query design for flexible exploration and scoring pipelines.
 
 ---
 
-## Key Findings
+## How to Run the SQL Pipeline
 
-| Risk Score | Total Customers | Claim Rate |
-|------------|------------------|------------|
-| 3+         | 304               | 63%        |
-| 2          | 1,885             | 52%        |
-| 1          | 3,071             | 27%        |
-| 0          | 2,889             | 18%        |
-
-- Customers with risk scores of 3 or higher had claim rates over three times higher than low-risk customers.
-- Risk factors such as low credit score, DUIs, and high annual mileage with older vehicles strongly aligned with claim occurrence.
-- Even basic SQL-driven risk scoring revealed clear segmentation of the insurance portfolio.
+1. **Create tables**: Run `schema.sql` in your SQL environment.
+2. **Load data**: Import the four CSVs into `customers`, `vehicles`, `driving_history`, and `claims`.
+3. **Risk flags**: Run `risk_flags.sql` to generate flag logic (optional views).
+4. **Score customers**: Execute `risk_scoring.sql` to generate the `risk_scores` view.
+5. **Explore**: Use `risk_analysis.sql` and `analytics.sql` for segmentation and performance.
 
 ---
 
-## Business Recommendations
+## Streamlit Dashboard
 
-- Use risk scores to flag high-risk customers for further claim investigation or pricing adjustments.
-- Apply targeted fraud audits to customers with scores of 3+.
-- Consider risk-based pricing adjustments for portfolios showing demographic or behavioural risk patterns.
-- Use the SQL risk scoring pipeline as a low-overhead portfolio monitoring tool.
+`streamlit_app/` contains a modular Streamlit dashboard broken into four interactive pages:
 
+| Page                 | Description                                                                 |
+|----------------------|-----------------------------------------------------------------------------|
+| **Overview**         | High-level summary of the dataset, risk tiers, and data structure.         |
+| **Risk Scoring**     | Explore scoring logic, heatmap of risk factor contribution.                |
+| **Segment Explorer** | Dynamic segment filters to drill into behavior, claims, and composition.   |
+| **Dashboard Summary**| Portfolio-wide KPIs, claim trends, gender/region risk, vehicle insights.   |
+
+### To run:
+```bash
+cd streamlit_app
+.\venv\Scripts\Activate 
+streamlit run app.py
+```
 ---
-
-## How to Run the SQL Queries
-
-1. Create the database schema using `sql/schema.sql`.
-2. Import the four processed CSV files into their corresponding tables (`customers`, `vehicles`, `driving_history`, `claims`).
-3. Run `risk_flags.sql` to generate the initial risk flag queries (optional for testing).
-4. Run `risk_scoring.sql` to create the `risk_scores` view and calculate risk scores.
-5. Run `risk_analysis.sql` for detailed segment profiling.
-6. Execute queries from `analytics.sql` to generate portfolio summaries and risk group comparisons.
-
----
-
-## Example Outputs
-
-### Risk Score Correlation with Claim Rate
-
-| risk_score | total_customers | total_claims | claim_rate |
-|------------|------------------|--------------|------------|
-|      4     |         1        |       0      |    0.00    |
-|      3     |       303        |     191      |    0.63    |
-|      2     |      1885        |     983      |    0.52    |
-|      1     |      3071        |     836      |    0.27    |
-|      0     |      2889        |     526      |    0.18    |
-
-### High-Risk Customers
-
-|    id    | risk_score | outcome |
-|----------|------------|---------|
-|  881409  |     4      |    0    |
-|   54408  |     3      |    1    |
-|   53008  |     3      |    1    |
-|   3643   |     3      |    1    |
-|   45797  |     3      |    1    |
-|   25908  |     3      |    1    |
-|   33610  |     3      |    1    |
