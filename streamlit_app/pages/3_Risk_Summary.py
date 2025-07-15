@@ -5,7 +5,7 @@ import pandas as pd
 import plotly.express as px
 from db_connection import get_connection
 
-st.title("Dashboard Summary")
+st.title("Risk Summary")
 st.markdown("This dashboard summarizes portfolio-wide performance using the risk scoring logic. "
             "It highlights claim rates by customer segment, risk distribution, and performance by score tier.")
 

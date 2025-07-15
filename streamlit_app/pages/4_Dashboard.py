@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 from db_connection import get_connection
 
-st.title("Segment Explorer")
+st.title("Dashboard")
 st.markdown("""
 This tool allows you to explore specific customer segments based on demographic and behavioral filters.
 You can filter by **risk score, age, income, credit score**, and **driving experience** to examine claim behavior, risk patterns, and segment composition.

@@ -10,10 +10,10 @@ This interactive dashboard explores a synthetic auto insurance dataset to identi
 
 ### **App Structure**
 Use the sidebar to explore the following sections:
-- **📁 Overview** – Portfolio-wide metrics and exploratory visualizations
-- **🧮 Risk Scoring** – SQL logic behind score construction and flag analysis
-- **🧠 Segment Explorer** – Filter and analyze customer subgroups
-- **📈 Dashboard Summary** – Risk band performance, distributions, and business insights
+- **Overview** – Portfolio-wide metrics and exploratory visualizations
+- **Risk Scoring** – SQL logic behind score construction and flag analysis
+- **Segment Explorer** – Filter and analyze customer subgroups
+- **Dashboard Summary** – Risk band performance, distributions, and business insights
                         
 ---
 
