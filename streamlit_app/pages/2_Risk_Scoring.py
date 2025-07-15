@@ -12,11 +12,11 @@ The risk scoring system assigns each customer a score between **0 and 5**, based
 Each factor is encoded as a binary flag (0 or 1), and the **total score is simply the sum of all flags**.
 
 **Risk Flags:**
-- 🛑 **Speeding Risk**: More than 5 speeding violations.
-- 🚫 **DUI Risk**: At least one recorded DUI.
-- 💳 **Low Credit Score**: Credit score below 0.5.
-- 🚗 **Vehicle Risk**: Vehicle is from **before 2015** and has mileage over **15,000 km/year**.
-- 👶 **Young Driver Risk**: Drivers aged **16–25** with **<10 years** of experience.
+- **Speeding Risk**: More than 5 speeding violations.
+- **DUI Risk**: At least one recorded DUI.
+- **Low Credit Score**: Credit score below 0.5.
+- **Vehicle Risk**: Vehicle is from **before 2015** and has mileage over **15,000 km/year**.
+- **Young Driver Risk**: Drivers aged **16–25** with **<10 years** of experience.
 
 These flags are defined and combined using SQL `CASE` logic and stored in a view called `risk_scores`.
 """)
