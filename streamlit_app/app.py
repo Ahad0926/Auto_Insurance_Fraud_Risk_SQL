@@ -4,7 +4,7 @@ import streamlit as st
 st.set_page_config(page_title="Auto Insurance Risk Dashboard", layout="wide")
 left_co, cent_co,last_co = st.columns(3)
 with cent_co:
-    st.image("public/Corbett_Insurance.png", width=500)
+    st.image("streamlit_app/public/Corbett_Insurance.png", width=500)
 
 st.title("Auto Insurance Risk & Claims Dashboard")
 st.markdown("### A SQL-Driven Portfolio Analysis Tool")
