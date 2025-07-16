@@ -8,15 +8,15 @@ from db_connection import get_connection
 st.title("Risk Scoring")
 
 st.markdown("""
-The risk scoring system assigns each customer a score between **0 and 5**, based on five behavioral and demographic factors.
-Each factor is encoded as a binary flag (0 or 1), and the **total score is simply the sum of all flags**.
+The risk scoring system assigns each customer a score between **0 and 5**, based on five behavioural and demographic factors.
+Each factor is encoded as a binary flag (0 or 1), and the total score is simply the sum of all flags.
 
 **Risk Flags:**
 - **Speeding Risk**: More than 5 speeding violations.
 - **DUI Risk**: At least one recorded DUI.
 - **Low Credit Score**: Credit score below 0.5.
-- **Vehicle Risk**: Vehicle is from **before 2015** and has mileage over **15,000 km/year**.
-- **Young Driver Risk**: Drivers aged **16–25** with **<10 years** of experience.
+- **Vehicle Risk**: Vehicle is from before 2015 and has mileage over 15,000 km/year.
+- **Young Driver Risk**: Drivers aged 16–25 with <10 years of experience.
 
 These flags are defined and combined using SQL `CASE` logic and stored in a view called `risk_scores`.
 """)
@@ -110,7 +110,8 @@ for i, col in enumerate(cols):
         chart = px.pie(
             names=["Flagged", "Not Flagged"],
             values=[count, total_customers - count],
-            title=title, color_discrete_sequence=px.colors.sequential.RdBu
+            title=title,
+            color_discrete_sequence=px.colors.sequential.RdBu
         )
         col.plotly_chart(chart, use_container_width=True)
 
@@ -133,7 +134,7 @@ st.subheader("Risk Score vs. Claim Rate")
 st.markdown("Higher risk scores are associated with higher claim rates, validating the scoring logic.")
 
 fig = px.line(score_df, x="risk_score", y="claim_rate", markers=True,
-              title="Claim Rate by Risk Score", labels={"claim_rate": "Claim Rate", "risk_score": "Risk Score"})
+              labels={"claim_rate": "Claim Rate", "risk_score": "Risk Score"}, color_discrete_sequence=px.colors.sequential.Bluered_r)
 st.plotly_chart(fig, use_container_width=True)
 
 with st.expander("View underlying SQL"):

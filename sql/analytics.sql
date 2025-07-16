@@ -7,6 +7,8 @@
 -- These queries are intended to power summary dashboards or reports.
 -- ===========================================================
 
+USE auto_insurance_db;
+
 -- 1. Portfolio-Wide Claim Rate
 -- Business Insight: Shows the overall claim rate across all customers.
 SELECT COUNT(*) AS total_customers,

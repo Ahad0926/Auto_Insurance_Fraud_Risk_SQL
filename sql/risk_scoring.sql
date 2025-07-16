@@ -6,6 +6,8 @@
 -- binary flags for each customer based on key risk factors.
 -- ===========================================================
 
+USE auto_insurance_db;
+
 -- 1. Create Risk Scores View
 -- Combines all individual risk flags into a total risk score for each customer.
 CREATE OR REPLACE VIEW risk_scores AS

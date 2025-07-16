@@ -29,10 +29,11 @@ https://ahad0926-auto-insurance-fraud-risk.streamlit.app/
 │
 ├── streamlit_app/                # Interactive analytics dashboard
 |   ├── pages/
-│   |   ├── 1_Overview.py
+│   |   ├── 1_Data_Overview.py
 │   |   ├── 2_Risk_Scoring.py
-│   |   ├── 3_Segment_Explorer.py
-│   |   └── 4_Dashboard_Summary.py
+│   |   ├── 3_Risk_Summary.py
+│   |   └── 4_Dashboard.py
+|   ├── public/
 |   ├── venv/
 |   ├── app.py
 |   ├── db_connection.py
@@ -71,6 +72,7 @@ https://ahad0926-auto-insurance-fraud-risk.streamlit.app/
 - **Streamlit**: Interactive dashboard with charts, filters, segment profiling.
 - **Plotly**: Bar charts, pie charts, line graphs, heatmaps, and grouped visualizations.
 - **Pandas**: CSV pre-processing.
+- **Amazon Aurora**: Used to host the MySQL database.
 - Modular query design for flexible exploration and scoring pipelines.
 
 ---
@@ -78,8 +80,8 @@ https://ahad0926-auto-insurance-fraud-risk.streamlit.app/
 ## How to Run the SQL Pipeline
 
 1. **Create tables**: Run `schema.sql` in your SQL environment.
-2. **Load data**: Import the four CSVs into `customers`, `vehicles`, `driving_history`, and `claims`.
-3. **Risk flags**: Run `risk_flags.sql` to generate flag logic (optional views).
+2. **load data**: Run `load_data.sql` to import datasets (Ensure file paths are correct and `LOCAL INFILE` is enabled).
+3. **Risk flags**: Run `risk_flags.sql` to generate flag logic.
 4. **Score customers**: Execute `risk_scoring.sql` to generate the `risk_scores` view.
 5. **Explore**: Use `risk_analysis.sql` and `analytics.sql` for segmentation and performance.
 
@@ -91,12 +93,12 @@ https://ahad0926-auto-insurance-fraud-risk.streamlit.app/
 
 | Page                 | Description                                                                 |
 |----------------------|-----------------------------------------------------------------------------|
-| **Overview**         | High-level summary of the dataset, risk tiers, and data structure.         |
-| **Risk Scoring**     | Explore scoring logic, heatmap of risk factor contribution.                |
-| **Segment Explorer** | Dynamic segment filters to drill into behavior, claims, and composition.   |
-| **Dashboard Summary**| Portfolio-wide KPIs, claim trends, gender/region risk, vehicle insights.   |
+| **Data Overview**    | High-level summary of the dataset, risk tiers, and data structure.          |
+| **Risk Scoring**     | Explore scoring logic, heatmap of risk factor contribution.                 |
+| **Risk Summary**     | Portfolio-wide KPIs, claim trends, gender/region risk, vehicle insights.    |
+| **Dashboard**        | Dynamic segment filters to drill into behaviour, claims, and composition.   |
 
-### To run:
+### To run locally:
 ```bash
 cd streamlit_app
 .\venv\Scripts\Activate 

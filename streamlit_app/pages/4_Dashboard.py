@@ -3,17 +3,17 @@ import pandas as pd
 import plotly.express as px
 from db_connection import get_connection
 
+# Title and description
 st.title("Dashboard")
 st.markdown("""
-This tool allows you to explore specific customer segments based on demographic and behavioral filters.
-You can filter by **risk score, age, income, credit score**, and **driving experience** to examine claim behavior, risk patterns, and segment composition.
+This tool allows you to explore specific customer segments based on demographic and behavioural filters.
+You can filter by risk score, age, income, credit score, and driving experience to examine claim behaviour, risk patterns, and segment composition.
 """)
 
 # ---------------------------
 # Sidebar filters
 # ---------------------------
 st.sidebar.header("Segment Filters")
-
 risk_range = st.sidebar.slider("Risk Score Range", 0, 5, (0, 5))
 age_options = st.sidebar.multiselect("Age Group", ["16-25", "26-39", "40-64", "65+"], default=["16-25", "26-39", "40-64", "65+"])
 income_options = st.sidebar.multiselect("Income Bracket", ["poverty", "working class", "middle class", "upper class"],
@@ -23,7 +23,7 @@ experience_options = st.sidebar.multiselect("Driving Experience", ["0-9y", "10-1
 credit_range = st.sidebar.slider("Credit Score Range", 0.0, 1.0, (0.0, 1.0))
 
 # ---------------------------
-# Dynamic SQL Generator
+# SQL generator
 # ---------------------------
 def build_sql_from_filters():
     query = """
@@ -34,25 +34,19 @@ def build_sql_from_filters():
     JOIN claims cl ON rs.id = cl.id
     WHERE 1=1
     """
-
     if age_options:
         age_str = ",".join(f"'{a}'" for a in age_options)
         query += f"\nAND c.age IN ({age_str})"
-
     if income_options:
         inc_str = ",".join(f"'{i}'" for i in income_options)
         query += f"\nAND c.income IN ({inc_str})"
-
     if experience_options:
         exp_str = ",".join(f"'{e}'" for e in experience_options)
         query += f"\nAND d.driving_experience IN ({exp_str})"
-
     if risk_range != (0, 5):
         query += f"\nAND rs.risk_score BETWEEN {risk_range[0]} AND {risk_range[1]}"
-
     if credit_range != (0.0, 1.0):
         query += f"\nAND c.credit_score BETWEEN {credit_range[0]} AND {credit_range[1]}"
-
     query += "\nORDER BY rs.risk_score DESC, cl.outcome DESC;"
     return query
 
@@ -70,65 +64,92 @@ sql_query = build_sql_from_filters()
 segment = load_segment(sql_query)
 
 # ---------------------------
-# Segment Summary Metrics
+# Summary metrics
 # ---------------------------
-st.subheader("Segment Summary")
-st.markdown(f"Filtered segment includes **{len(segment):,} customers**.")
-
-col1, col2, col3 = st.columns(3)
-col1.metric("Avg. Risk Score", f"{segment['risk_score'].mean():.2f}")
-col2.metric("Claim Rate", f"{segment['outcome'].mean() * 100:.2f}%")
-col3.metric("Avg. Credit Score", f"{segment['credit_score'].mean():.2f}")
+col1, col2, col3, col4 = st.columns(4)
+col1.metric("Customers", f"{len(segment):,}")
+col2.metric("Avg. Risk Score", f"{segment['risk_score'].mean():.2f}")
+col3.metric("Claim Rate", f"{segment['outcome'].mean() * 100:.2f}%")
+col4.metric("Avg. Credit Score", f"{segment['credit_score'].mean():.2f}")
 
 # ---------------------------
-# Segment Table
+# Two-column layout: Table | Visuals
 # ---------------------------
-st.dataframe(segment, use_container_width=True)
+main_col1, main_col2 = st.columns([1, 1])
 
-with st.expander("View underlying SQL template"):
-    st.code(sql_query.strip(), language="sql")
+# --- Left: Data table ---
+with main_col1:
+    st.subheader("Filtered Segment Table")
+    st.dataframe(segment, use_container_width=True)
 
-# ---------------------------
-# Export Filtered Segment
-# ---------------------------
-csv = segment.to_csv(index=False).encode('utf-8')
-st.download_button("📥 Export Segment as CSV", csv, "segment.csv", "text/csv")
+    csv = segment.to_csv(index=False).encode("utf-8")
+    st.download_button("📥 Export Segment as CSV", csv, "segment.csv", "text/csv")
 
-# ---------------------------
-# Segment Visuals
-# ---------------------------
-if len(segment) > 0:
+    with st.expander("View underlying SQL template"):
+        st.code(sql_query.strip(), language="sql")
+
+# --- Right: Visualizations ---
+with main_col2:
     st.subheader("Segment Composition")
-    col4, col5 = st.columns(2)
+    vis_col1, vis_col2 = st.columns([1, 1])
 
-    with col4:
+    with vis_col1:
+        # Bar chart: Age distribution
         age_counts = segment["age"].value_counts().reset_index()
         age_counts.columns = ["age", "count"]
-        st.plotly_chart(px.bar(
+        age_order = ["16-25", "26-39", "40-64", "65+"]
+        age_counts["age"] = pd.Categorical(age_counts["age"], categories=age_order, ordered=True)
+        age_counts = age_counts.sort_values("age")
+
+        age_fig = px.bar(
             age_counts, x="age", y="count",
             labels={"age": "Age Group", "count": "Count"},
-            title="Age Distribution"
-        ), use_container_width=True)
+            title="Age Distribution",
+            color_discrete_sequence=px.colors.sequential.Teal_r
+        )
+        age_fig.update_layout(height=300)
+        age_fig.update_layout(title={'x': 0.4})
+        st.plotly_chart(age_fig, use_container_width=True)
 
-    with col5:
+        # Horizontal Bar Chart: Customers per Risk Score
+        risk_counts = segment["risk_score"].value_counts().reset_index()
+        risk_counts.columns = ["risk_score", "count"]
+        risk_counts = risk_counts.sort_values("risk_score")
+
+        risk_fig = px.bar(
+            risk_counts, x="count", y="risk_score", orientation="h",
+            labels={"risk_score": "Risk Score", "count": "Customers"},
+            title="Customers per Risk Score",
+            color_discrete_sequence=px.colors.sequential.Teal_r
+        )
+        risk_fig.update_layout(height=300)
+        risk_fig.update_layout(title={'x': 0.3})
+        st.plotly_chart(risk_fig, use_container_width=True)
+
+    with vis_col2:
+        # Pie chart 1: Income
         income_counts = segment["income"].value_counts().reset_index()
         income_counts.columns = ["income", "count"]
-        st.plotly_chart(px.pie(
+
+        income_fig = px.pie(
             income_counts, names="income", values="count",
-            title="Income Bracket Distribution"
-        ), use_container_width=True)
+            title="Income Bracket Distribution",
+            color_discrete_sequence=px.colors.sequential.PuBu_r
+        )
+        income_fig.update_layout(height=300)
+        income_fig.update_layout(title={'x': 0.25})
+        st.plotly_chart(income_fig, use_container_width=True)
 
-    # ---------------------------
-    # Claim Outcome Breakdown
-    # ---------------------------
-    st.subheader("Claim Outcome Breakdown")
+        # Pie chart 2: Claims
+        outcome_counts = segment["outcome"].value_counts().reset_index()
+        outcome_counts.columns = ["Outcome", "Count"]
+        outcome_counts["Outcome"] = outcome_counts["Outcome"].map({0: "No Claim", 1: "Filed Claim"})
 
-    outcome_counts = segment["outcome"].value_counts().reset_index()
-    outcome_counts.columns = ["Outcome", "Count"]
-    outcome_counts["Outcome"] = outcome_counts["Outcome"].map({0: "No Claim", 1: "Filed Claim"})
-
-    st.plotly_chart(px.pie(
-        outcome_counts, names="Outcome", values="Count",
-        title="Claim Outcome Distribution"
-    ), use_container_width=True)
-
+        outcome_fig = px.pie(
+            outcome_counts, names="Outcome", values="Count",
+            title="Claim Outcome Distribution",
+            color_discrete_sequence=px.colors.sequential.PuBu_r
+        )
+        outcome_fig.update_layout(height=300)
+        outcome_fig.update_layout(title={'x': 0.25})
+        st.plotly_chart(outcome_fig, use_container_width=True)
