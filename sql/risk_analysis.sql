@@ -6,6 +6,8 @@
 -- These queries help profile the insurance portfolio before and after risk scoring.
 -- ===========================================================
 
+USE auto_insurance_db;
+
 -- 1. Claim Rate by Postal Code
 -- Business Insight: Identify regional hotspots with higher claim rates.
 SELECT c.postal_code,
@@ -42,7 +44,7 @@ GROUP BY c.gender
 ORDER BY avg_risk_score DESC;
 
 -- 4. Average Annual Mileage by Vehicle Type
--- Business Insight: Understand driving behavior across vehicle types.
+-- Business Insight: Understand driving behaviour across vehicle types.
 SELECT vehicle_type,
        ROUND(AVG(annual_mileage), 0) AS avg_annual_mileage,
        COUNT(*) AS total_vehicles

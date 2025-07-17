@@ -11,7 +11,7 @@ st.markdown("This section explores the synthetic auto insurance dataset using SQ
             "Key metrics include claim rates by age, income, credit bands, and regional segments.")
 st.markdown(
     "This analysis is based on the [_Car Insurance Claim_](https://www.kaggle.com/datasets/sagnik1511/car-insurance-data/data) dataset from Kaggle, "
-    "which we cleaned, normalized, and split into four SQL tables shown below."
+    "which was cleaned, normalized, and split into four SQL tables shown below."
 )
 
 # ----------------------------
@@ -65,19 +65,19 @@ def render_section(title, sql, df, chart=None, layout="visual", note=None):
 
     if layout == "left_chart":
         col1, col2 = st.columns((1, 1))
+        col2.plotly_chart(chart, use_container_width=True)
         with col1:
             st.dataframe(df, use_container_width=True)
             with st.expander("View underlying SQL"):
                 st.code(sql.strip(), language="sql")
-        col2.plotly_chart(chart, use_container_width=True)
-
+        
     elif layout == "right_chart":
-        col1, col2 = st.columns((1, 1))
-        col1.plotly_chart(chart, use_container_width=True)
+        col1, col2 = st.columns((1, 1))        
         with col2:
             st.dataframe(df, use_container_width=True)
             with st.expander("View underlying SQL"):
                 st.code(sql.strip(), language="sql")
+        col1.plotly_chart(chart, use_container_width=True)
 
     elif layout == "visual":
         st.plotly_chart(chart, use_container_width=True)
@@ -146,7 +146,7 @@ GROUP BY c.gender
 ORDER BY avg_risk_score DESC;
 """
 df3 = run_query("gender", sql3)
-fig3 = px.pie(df3, names="gender", values="total_customers", title="Customer Distribution by Gender")
+fig3 = px.pie(df3, names="gender", values="total_customers")
 render_section("3. Risk by Gender", sql3, df3, chart=fig3, layout="left_chart",
                note="Male customers show slightly higher average risk scores and claim rates compared to females, suggesting mild gender-based risk variation.")
 
@@ -168,8 +168,7 @@ fig4 = px.bar(
     y="value",
     color="variable",
     barmode="group",
-    text="value",
-    title="Mileage & Vehicle Count by Type"
+    text="value"
 )
 fig4.update_traces(textposition="outside")
 
@@ -190,7 +189,7 @@ GROUP BY age
 ORDER BY claim_rate DESC;
 """
 df5 = run_query("age", sql5)
-fig5 = px.line(df5.sort_values("age"), x="age", y="claim_rate", title="Claim Rate by Age")
+fig5 = px.line(df5.sort_values("age"), x="age", y="claim_rate")
 render_section("5. Claim Rate by Age", sql5, df5, chart=fig5, layout="visual",
                note="Younger drivers (under 25) exhibit the highest claim rates, likely due to inexperience.")
 
@@ -208,7 +207,7 @@ GROUP BY risk_score
 ORDER BY risk_score DESC;
 """
 df6 = run_query("risk_score_summary", sql6)
-fig6 = px.area(df6.sort_values("risk_score"), x="risk_score", y="claim_rate", title="Claim Rate by Risk Score")
+fig6 = px.area(df6.sort_values("risk_score"), x="risk_score", y="claim_rate")
 render_section("6. Risk Score vs. Claim Rate", sql6, df6, chart=fig6, layout="visual",
                note="Risk scoring is effective — as risk scores increase, claim rates consistently rise, validating the predictive value of the scoring logic.")
 
@@ -262,7 +261,7 @@ GROUP BY vehicle_year
 ORDER BY claim_rate DESC;
 """
 df9 = run_query("vehicle_year", sql9)
-fig9 = px.pie(df9, names="vehicle_year", values="claim_rate", color_discrete_sequence=px.colors.sequential.Emrld_r, title="Claim Rate Distribution by Vehicle Year")
+fig9 = px.pie(df9, names="vehicle_year", values="claim_rate")
 render_section("9. Claim Rate by Vehicle Year", sql9, df9, chart=fig9, layout="visual",
                note="Claim rates are higher for older vehicles, possibly due to wear, lower safety standards, or other risk indicators.")
 
@@ -277,7 +276,8 @@ GROUP BY risk_score
 ORDER BY risk_score DESC;
 """
 df10 = run_query("risk_score_dist", sql10)
-fig10 = px.histogram(df10, x="risk_score", y="num_customers", nbins=10, title="Risk Score Distribution")
+fig10 = px.histogram(df10, x="risk_score", y="num_customers", nbins=10)
+fig10.update_xaxes(dtick=1)
 render_section("10. Risk Score Distribution", sql10, df10, chart=fig10, layout="visual",
                note="Risk score distribution shows a healthy spread across the portfolio, though most customers cluster at scores between 0–2.")
 
@@ -302,6 +302,6 @@ GROUP BY credit_band
 ORDER BY claim_rate DESC;
 """
 df11 = run_query("credit_band", sql11)
-fig11 = px.bar(df11, x="credit_band", y="claim_rate", color="avg_risk_score", title="Risk by Credit Band")
+fig11 = px.bar(df11, x="credit_band", y="avg_risk_score", color="claim_rate")
 render_section("11. Risk by Credit Score Band", sql11, df11, chart=fig11, layout="right_chart",
                note="Stronger credit scores correlate with lower average risk and claim rates — very low credit bands carry significantly higher risk.")

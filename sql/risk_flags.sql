@@ -1,10 +1,12 @@
 -- ===========================================================
 -- risk_flags.sql: Risk Factor Queries for Auto Insurance Analysis
 -- ===========================================================
--- This script creates individual risk flags for key behavioral,
+-- This script creates individual risk flags for key behavioural,
 -- demographic, and vehicle-related attributes associated with claim risk.
 -- These queries serve as the building blocks of the overall risk scoring system.
 -- ===========================================================
+
+USE auto_insurance_db;
 
 -- 1. Speeding Risk Flag
 -- Business Insight: Customers with frequent speeding violations are higher claim risks.
@@ -27,7 +29,7 @@ SELECT id,
 FROM driving_history;
 
 -- 3. Low Credit Score Risk Flag
--- Business Insight: Customers with low credit scores may exhibit higher financial or behavioral risk.
+-- Business Insight: Customers with low credit scores may exhibit higher financial or behavioural risk.
 SELECT id,
        credit_score,
        CASE
