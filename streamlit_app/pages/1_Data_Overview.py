@@ -146,8 +146,21 @@ GROUP BY c.gender
 ORDER BY avg_risk_score DESC;
 """
 df3 = run_query("gender", sql3)
-fig3 = px.pie(df3, names="gender", values="total_customers")
-render_section("3. Risk by Gender", sql3, df3, chart=fig3, layout="left_chart",
+df3_melted = df3.melt(
+    id_vars="gender",
+    value_vars=["avg_risk_score", "claim_rate"],
+    var_name="metric",
+    value_name="value"
+)
+fig3 = px.bar(
+    df3_melted,
+    x="gender", y="value", color="metric", barmode="group", text="value",
+    labels={"value": "Metric Value", "gender": "Gender", "metric": "Metric"}
+)
+fig3.update_traces(textposition="outside")
+fig3.update_layout(showlegend=True)
+fig3.update_layout(height=500)
+render_section("3. Risk & Claim Rate by Gender", sql3, df3, chart=fig3, layout="left_chart",
                note="Male customers show slightly higher average risk scores and claim rates compared to females, suggesting mild gender-based risk variation.")
 
 # ----------------------------
@@ -171,7 +184,7 @@ fig4 = px.bar(
     text="value"
 )
 fig4.update_traces(textposition="outside")
-
+fig4.update_layout(height=500)
 render_section("4. Mileage by Vehicle Type", sql4, df4, chart=fig4, layout="right_chart",
                note="Sedan car drivers tend to log higher mileage annually than sports drivers, which may increase exposure and claim likelihood.")
 
@@ -225,7 +238,14 @@ GROUP BY age, income
 ORDER BY age, income;
 """
 df7 = run_query("age_income", sql7)
-fig7 = px.density_heatmap(df7, x="age", y="income", z="claim_rate", nbinsx=20, color_continuous_scale="Blues")
+fig7 = px.density_heatmap(
+    df7, x="age", y="income", z="claim_rate",
+    nbinsx=20, color_continuous_scale="Blues",
+    category_orders={
+        "income": ["upper class", "middle class", "working class", "poverty"]
+    }
+)
+fig7.update_coloraxes(colorbar_title="Average Claim Rate")
 render_section("7. Claim Rate by Age and Income", sql7, df7, chart=fig7, layout="visual",
                note="Claim patterns vary by both age and income — certain age-income intersections show concentrated risk, as revealed by this heatmap.")
 
