@@ -107,7 +107,7 @@ ORDER BY claim_rate DESC;
 """
 df1 = run_query("postal", sql1)
 df1["postal_code"] = df1["postal_code"].astype(str)
-fig1 = px.bar(df1, x="postal_code", y="claim_rate", title="Claim Rate by Postal Code", category_orders={"postal_code": df1["postal_code"].tolist()})
+fig1 = px.bar(df1, x="postal_code", y="claim_rate", category_orders={"postal_code": df1["postal_code"].tolist()})
 fig1.update_xaxes(type='category')
 render_section("1. Claim Rate by Postal Code", sql1, df1, chart=fig1, layout="left_chart",
                note="Certain postal codes show significantly higher claim rates, suggesting potential geographic risk clusters or fraud hotspots.")

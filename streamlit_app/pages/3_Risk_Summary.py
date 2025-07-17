@@ -131,36 +131,34 @@ High-risk customers are defined as those with a risk score ≥ 3.
 with st.expander("View underlying SQL"):
     st.code(data["High-Risk Snapshot"].attrs["query"], language="sql")
 
+col1, col2 = st.columns([1,1])
+with col1:
+    # Claim Rate by Risk Category
+    st.subheader("Claim Rate by Risk Tier")
 
-# -----------------------------
-# Claim Rate by Risk Category
-# -----------------------------
-st.subheader("Claim Rate by Risk Tier")
+    tier_df = data["Claim Rate by Risk Tier"]
+    fig = px.bar(tier_df, x="risk_category", y="claim_rate",
+                 text="claim_rate", labels={"risk_category": "Risk Tier", "claim_rate": "Claim Rate"},
+                 color="risk_category")
+    fig.update_layout(showlegend=False)
 
-tier_df = data["Claim Rate by Risk Tier"]
-fig = px.bar(tier_df, x="risk_category", y="claim_rate",
-             text="claim_rate", labels={"risk_category": "Risk Tier", "claim_rate": "Claim Rate"},
-             color="risk_category")
-fig.update_layout(showlegend=False)
+    st.plotly_chart(fig, use_container_width=True)
 
-st.plotly_chart(fig, use_container_width=True)
+    with st.expander("View underlying SQL"):
+        st.code(tier_df.attrs["query"], language="sql")
 
-with st.expander("View underlying SQL"):
-    st.code(tier_df.attrs["query"], language="sql")
-
-# -----------------------------
-# Risk Score Distribution
-# -----------------------------
-st.subheader("Risk Score Distribution")
-
-dist_df = data["Risk Score Distribution"]
-fig2 = px.pie(dist_df, names="risk_score", values="pct_of_portfolio")
-fig2.update_layout(legend=dict(traceorder="reversed"))
-
-st.plotly_chart(fig2, use_container_width=True)
-
-with st.expander("View underlying SQL"):
-    st.code(dist_df.attrs["query"], language="sql")
+with col2:
+    # Risk Score Distribution
+    st.subheader("Risk Score Distribution")
+    
+    dist_df = data["Risk Score Distribution"]
+    fig2 = px.pie(dist_df, names="risk_score", values="pct_of_portfolio")
+    fig2.update_layout(legend=dict(traceorder="reversed"))
+    
+    st.plotly_chart(fig2, use_container_width=True)
+    
+    with st.expander("View underlying SQL"):
+        st.code(dist_df.attrs["query"], language="sql")
 
 # -----------------------------
 # Total Claim Load by Risk Score
